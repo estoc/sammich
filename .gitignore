@@ -17,3 +17,5 @@ _testmain.go
 *.exe
 *.test
 *.prof
+# Built Executable
+sandwhich

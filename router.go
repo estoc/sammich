@@ -23,7 +23,8 @@ func NewMethodRouter() *MethodRouter {
   router := &MethodRouter{methods, mux.NewRouter(), make(map[string]*mux.Router)}
 
   for _, method := range router.methods {
-    router.subRouters[method] = router.primaryRouter.Methods(method).Subrouter()
+    // all api routes start with /api/
+    router.subRouters[method] = router.primaryRouter.PathPrefix("/api/").Methods(method).Subrouter()
   }
 
   return router
@@ -35,6 +36,11 @@ func NewMethodRouter() *MethodRouter {
 func (mr MethodRouter) HandleFunc(method string, path string, handleFunc HttpHandler) {
   mr.subRouters[method].HandleFunc(path, DecoratorMdw(handleFunc))
   return
+}
+
+// Serve static content from an absolute path on the fs
+func (mr MethodRouter) ServeStatic(dirPath string) {
+  mr.primaryRouter.PathPrefix("/").Handler(http.FileServer(http.Dir(dirPath)))
 }
 
 // Start server.

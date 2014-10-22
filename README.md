@@ -6,6 +6,7 @@ The backend REST API for Sandwhich
 * Install Golang (sample script below for Ubuntu 64bit)
 * Run ./bin/getimports.sh
 * go build && ./sandwhich
+* for usage details: ./sandwhich -help
 
 ```bash
 ### Go installation script

@@ -1,12 +1,12 @@
-# Sandwhich-Server
+# chewcrew server
 
-The backend REST API for Sandwhich
+The backend REST API for chewcrew
 
 ## Getting Started
 * Install Golang (sample script below for Ubuntu 64bit)
 * Run ./bin/getimports.sh
-* go build && ./sandwhich
-* for usage details: ./sandwhich -help
+* go build && ./chewcrew
+* for usage details: ./chewcrew -help
 
 ```bash
 ### Go installation script

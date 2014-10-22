@@ -29,7 +29,9 @@ func NewMethodRouter() *MethodRouter {
   return router
 }
 
-// Register a router. See mux.Router documentation for regexp path rules, etc.
+// Register a route. See mux.Router documentation for regexp path rules, etc.
+//
+// This method also wraps the provided handler with a decorator middleware.
 func (mr MethodRouter) HandleFunc(method string, path string, handleFunc HttpHandler) {
   mr.subRouters[method].HandleFunc(path, DecoratorMdw(handleFunc))
   return

@@ -17,6 +17,7 @@ type MethodRouter struct {
   subRouters map[string]*mux.Router
 }
 
+// Get a new MethodRouter
 func NewMethodRouter() *MethodRouter {
   methods := []string{"GET", "POST", "PUT", "DELETE"}
   router := &MethodRouter{methods, mux.NewRouter(), make(map[string]*mux.Router)}

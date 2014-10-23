@@ -25,7 +25,7 @@ func DecoratorMdw(next HttpHandler) HttpHandler {
       http.Error(w, "failed to attach request logger", http.StatusInternalServerError)
       return
     }
-    context.Set(r, "log", reqLog) // pass dereferenced reqLog so that requests can't modify logger
+    context.Set(r, "log", reqLog)
 
     // log incoming request
     headers, err := json.MarshalIndent(r.Header, "", "\t")

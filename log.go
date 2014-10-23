@@ -12,6 +12,7 @@ const (
 )
 
 // simple wrapper around the go-logging library that allows us to easily create child loggers
+// TODO: support filesystem logging
 type logger struct {
   logging.Logger
   level int

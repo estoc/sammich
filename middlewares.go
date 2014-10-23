@@ -45,7 +45,7 @@ func CleanupMdw(next HttpHandler) HttpHandler {
     log := context.Get(r, "log").(*logger)
 
     // wrap our response writer so that we can log when the request leaves the system
-    next(&loggedResponseWriter{w: w, r: r, log: *log}, r)
+    next(&loggedResponseWriter{w: w, r: r, log: log}, r)
 
     context.Clear(r)
   }
@@ -55,7 +55,7 @@ func CleanupMdw(next HttpHandler) HttpHandler {
 type loggedResponseWriter struct {
   w    http.ResponseWriter
   r    *http.Request
-  log  logger
+  log  *logger
   status int
 }
 func (w *loggedResponseWriter) Header() http.Header {

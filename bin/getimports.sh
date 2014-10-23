@@ -1,5 +1,7 @@
 #!/bin/bash
-echo Fetching imports for Sandwhich...
+echo Fetching imports for chewcrew...
 go get github.com/gorilla/mux
 go get github.com/gorilla/feeds
-echo Done fetching imports for Sandwhich!
+go get github.com/gorilla/context
+go get github.com/op/go-logging
+echo Done fetching imports for chewcrew!

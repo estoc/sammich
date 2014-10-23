@@ -32,14 +32,17 @@ func NewMethodRouter() *MethodRouter {
 
 // Register a route. See mux.Router documentation for regexp path rules, etc.
 //
-// This method also wraps the provided handler with a decorator middleware.
+// This method also wraps the provided handler with a decorator middleware and a middleware that
+// clears the request context.
 func (mr MethodRouter) HandleFunc(method string, path string, handleFunc HttpHandler) {
-  mr.subRouters[method].HandleFunc(path, DecoratorMdw(handleFunc))
+  serverLog.Info("Registering api route [%s /api%s]", method, path)
+  mr.subRouters[method].HandleFunc(path, DecoratorMdw(CleanupMdw(handleFunc)))
   return
 }
 
 // Serve static content from an absolute path on the fs
 func (mr MethodRouter) ServeStatic(dirPath string) {
+  serverLog.Info("Serving statics assets from \"%s\"", dirPath)
   mr.primaryRouter.PathPrefix("/").Handler(http.FileServer(http.Dir(dirPath)))
 }
 

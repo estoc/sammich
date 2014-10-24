@@ -43,8 +43,6 @@ baseUri: http://chewcrew.io/{version}
                 "type": "object",
                 "description": "A voting session",
                 "properties": {
-                "voterId": "Current voters unique UUID",
-                "voterId": {"type": "string"},
                 "voters": "Total number of unique voters participating",
                 "voters": { 
                   "type": "array",
@@ -52,14 +50,14 @@ baseUri: http://chewcrew.io/{version}
                   },
                 "voted": "Total number of current votes",
                 "voted": {"type": "int"},
-                "choices": "Will be populated once the voting session has started",
+                "choices": "Voting choices. Will be populated when the voting session has started.",
                 "choices": {
                   "type": "array",
                   "items": {"type" : "string"},
                   "minItems": 3,
                   "uniqueItems": true
                   },
-                "result": "The winning result. Will be populating once all voters have voted.",
+                "result": "The winning result. Will be populated when all users have voted or the session has ended.",
                 "result": {"type": "string"}
                 }}
     put:
@@ -69,6 +67,19 @@ baseUri: http://chewcrew.io/{version}
           description: Voters name
         preferences:
           description: Preferences to add
+      responses:
+        200:
+          body:
+            application/json:
+              schema: |
+                {
+                "$schema": "http://json-schema.org/schema",
+                "type": "object",
+                "description": "Voter UUID",
+                "properties": {
+                "voterId": "Current voters assigned unique UUID",
+                "voterId": {"type": "string"}
+                }}
     post:
       description: Submit a vote to a voting session
       queryParameters:

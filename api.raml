@@ -21,45 +21,22 @@ baseUri: http://chewcrew.io/{version}
               "type": "object",
               "description": "A voting session",
               "properties": {
-              "session": "Session UUID",
-              "session": { "type": "string" }
+              "sessionId": "Session UUID",
+              "sessionId": { "type": "string" }
               }}
   /{id}:
     /start:
       post:
         description: Starts the voting session
+        queryParameters:
+          voterId:
+            description: Voter UUID to identify the session host
     /end:
       post:
         description: Forcefully ends a voting session
-    get:
-      description: Retrieve a voting session
-      responses:
-        200:
-          body:
-            application/json:
-              schema: |
-                {
-                "$schema": "http://json-schema.org/schema",
-                "type": "object",
-                "description": "A voting session",
-                "properties": {
-                "voters": "Total number of unique voters participating",
-                "voters": { 
-                  "type": "array",
-                  "name": {"type": "string"}
-                  },
-                "voted": "Total number of current votes",
-                "voted": {"type": "int"},
-                "choices": "Voting choices. Will be populated when the voting session has started.",
-                "choices": {
-                  "type": "array",
-                  "items": {"type" : "string"},
-                  "minItems": 3,
-                  "uniqueItems": true
-                  },
-                "result": "The winning result. Will be populated when all users have voted or the session has ended.",
-                "result": {"type": "string"}
-                }}
+        queryParameters:
+          voterId:
+            description: Voter UUID to identify the session host
     put:
       description: Update a voting session (will be done when voters first enter a session)
       queryParameters:
@@ -77,8 +54,39 @@ baseUri: http://chewcrew.io/{version}
                 "type": "object",
                 "description": "Voter UUID",
                 "properties": {
-                "voterId": "Current voters assigned unique UUID",
+                "voterId": "UUID assigned to this voter",
                 "voterId": {"type": "string"}
+                }}
+    get:
+      description: Retrieve a voting session
+      responses:
+        200:
+          body:
+            application/json:
+              schema: |
+                {
+                "$schema": "http://json-schema.org/schema",
+                "type": "object",
+                "description": "A voting session",
+                "properties": {
+                "voterId": "Current voters UUID. Will be populated if voter has Put their preferences.",
+                "voterId": {"type": "string"},
+                "voters": "Total number of unique voters participating",
+                "voters": { 
+                  "type": "array",
+                  "name": {"type": "string"}
+                  },
+                "voted": "Total number of current votes",
+                "voted": {"type": "int"},
+                "choices": "Voting choices. Will be populated when the voting session has started.",
+                "choices": {
+                  "type": "array",
+                  "items": {"type" : "string"},
+                  "minItems": 3,
+                  "uniqueItems": true
+                  },
+                "result": "The winning result. Will be populated when all users have voted or the session has ended.",
+                "result": {"type": "string"}
                 }}
     post:
       description: Submit a vote to a voting session

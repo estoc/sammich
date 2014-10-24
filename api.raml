@@ -1,0 +1,65 @@
+#%RAML 0.8
+title: ChewCrew
+version: v1
+baseUri: http://chewcrew.io/{version}
+
+/preferences:
+  /categories:
+    get:
+      description: Only display category type preferences (BBQ, Chinese, Pizza, etc.)
+
+/sessions:
+  post:
+    description: Create a voting session
+    queryParameters:
+
+  /{id}:
+    /start:
+      post:
+        description: Starts the voting session
+    /end:
+      post:
+        description: Forcefully ends a voting session
+    get:
+      description: Retrieve a voting session
+      responses:
+        200:
+          body:
+            application/json:
+              schema: |
+                {
+                "$schema": "http://json-schema.org/schema",
+                "type": "object",
+                "description": "A voting session",
+                "properties": {
+                "voters": "Total number of unique voters participating",
+                "voters": { 
+                  "type": "array",
+                  "name": {"type": "string"}
+                  },
+                "voted": "Total number of current votes",
+                "voted": {"type": "int"},
+                "choices": "Will be populated once the voting session has started",
+                "choices": {
+                  "type": "array",
+                  "items": {"type" : "string"},
+                  "minItems": 3,
+                  "uniqueItems": true
+                  },
+                "result": "The winning result. Will be populating once all voters have voted.",
+                "result": {"type": "string"}
+                }}
+    put:
+      description: Update a voting session (will be done when voters first enter a session)
+      queryParameters:
+        name:
+          description: Voters name
+        preferences:
+          description: Preferences to add
+        location:
+          description: Location to add
+    post:
+      description: Submit a vote to a voting session
+      queryParameters:
+        choice:
+          description: Vote to submit

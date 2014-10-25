@@ -1,7 +1,6 @@
 package main
 
 import (
-  "encoding/json"
   "net/http"
   "github.com/gorilla/feeds"
   "github.com/gorilla/context"
@@ -21,18 +20,15 @@ func DecoratorMdw(next HttpHandler) HttpHandler {
     // attach logger to request context
     reqLog, err := serverLog.Child(uuidv4)
     if err != nil {
-      reqLog.Error("failed to attach request logger: %s", err)
-      http.Error(w, "failed to attach request logger", http.StatusInternalServerError)
+      msg := "failed to attach request logger"
+      reqLog.Error(NewMaskedErrorf(err, msg))
+      http.Error(w, msg, http.StatusInternalServerError)
       return
     }
     context.Set(r, "log", reqLog)
 
     // log incoming request
-    headers, err := json.MarshalIndent(r.Header, "", "\t")
-    if err != nil {
-      reqLog.Error("an error occurred when marshalling request headers: %s", err)
-    }
-    reqLog.Info("[%s] [%s %s]\n%s", r.Host, r.Method, r.RequestURI, headers)
+    reqLog.Info(r.Header, "[%s] [%s %s]", r.Host, r.Method, r.RequestURI)
 
     next(w, r)
   }
@@ -68,11 +64,7 @@ func (w *loggedResponseWriter) Write(d []byte) (int, error) {
   }
 
   // log outgoing request
-  headers, err := json.MarshalIndent(w.w.Header(), "", "\t")
-  if err != nil {
-    w.log.Error("an error occurred when marshalling response headers: %s", err)
-  }
-  w.log.Info("[%s] [%s %s] [%v]\n%s", w.r.Host, w.r.Method, w.r.RequestURI, w.status, headers)
+  w.log.Info(w.w.Header(), "[%s] [%s %s] [%v]", w.r.Host, w.r.Method, w.r.RequestURI, w.status)
 
   return w.w.Write(d)
 }

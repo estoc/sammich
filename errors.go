@@ -11,7 +11,7 @@ const maxStackLength = 100000
 // A simple wrapper around native errors that also provides a stack trace and an optional context
 // message.
 type Error struct {
-	e       error
+	E       error
 	Context string
 	Stack   string
 }
@@ -25,7 +25,7 @@ func (e Error) Error() string {
 	}
 
 	// provide error message and stack
-	s += fmt.Sprintf("%s\n%s", e.e.Error(), e.Stack)
+	s += fmt.Sprintf("%s\n%s", e.E.Error(), e.Stack)
 
 	return s
 }

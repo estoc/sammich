@@ -3,9 +3,22 @@
 The backend REST API for chewcrew
 
 ## Getting Started
-* Install Golang (sample script below for Ubuntu 64bit)
-* Run ./bin/getimports.sh
-* go build && ./chewcrew
+* Get the code
+```bash
+git clone git://github.com/wafflehaus/chewcrew.git $GOPATH/src/github.com/wafflehaus/chewcrew
+```
+
+* Get dependencies
+```bash
+$GOPATH/src/github.com/wafflehaus/chewcrew/bin/getimports.sh
+```
+* Compile the code and start the server!
+```bash
+go install github.com/wafflehaus/chewcrew && $GOPATH/bin/chewcrew
+```
+
+## Installing Go
+Use [gvm](https://github.com/moovweb/gvm), or install Golang (sample script below for Ubuntu 64bit). Installing from gvm is advised due to the simplicity.
 
 ```bash
 ### Go installation script
@@ -31,7 +44,7 @@ echo "export PATH=\$PATH:/usr/local/go/bin" >> $HOME/.profile
 For server configurables, execute the following:
 
 ```bash
-./chewcrew -help
+go install github.com/wafflehaus/chewcrew && $GOPATH/bin/chewcrew -help
 ```
 
 ### Static Assets
@@ -83,5 +96,5 @@ switch err.(type) {
 Before merging, it is strongly advised that you `go fmt` your fork.
 
 ```bash
-go fmt ~/workspace/chewcrew
+go fmt github.com/wafflehaus/chewcrew
 ```

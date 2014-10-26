@@ -65,7 +65,7 @@ godoc -http=:6060
 ```
 Open [http://localhost:6060/pkg/github.com/wafflehaus/chewcrew](http://localhost:6060/pkg/github.com/wafflehaus/chewcrew) in your browser.
 
-### Before Merging
+## Before Merging
 
 Before merging, it is strongly advised that you `go fmt` your fork.
 

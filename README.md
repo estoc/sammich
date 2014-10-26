@@ -55,6 +55,22 @@ Static assets are served on the root path. The absolute path of the static asset
 
 API routes are found on the path `/api/*`. Consult the `api.raml` file for API specification.
 
+## Documentation
+
+```bash
+godoc -http=:6060
+```
+
+Open [http://localhost:6060/pkg/github.com/wafflehaus/chewcrew](http://localhost:6060/pkg/github.com/wafflehaus/chewcrew) in your browser.
+
+### Before Merging
+
+Before merging, it is strongly advised that you `go fmt` your fork.
+
+```bash
+go fmt github.com/wafflehaus/chewcrew
+```
+
 ## Development Notes
 
 ### Logging
@@ -89,12 +105,4 @@ switch err.(type) {
   MyCustomError2:
     // handle MyCustomerError2
 }
-```
-
-### Before Merging
-
-Before merging, it is strongly advised that you `go fmt` your fork.
-
-```bash
-go fmt github.com/wafflehaus/chewcrew
 ```

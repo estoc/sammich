@@ -36,7 +36,6 @@ For server configurables, execute the following:
 
 ### Static Assets
 
-
 Static assets are served on the root path. The absolute path of the static assets directory is available as a server configurable.
 
 ### API

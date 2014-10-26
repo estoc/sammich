@@ -1,15 +1,15 @@
 package main
 
 import (
-  "io"
-  "net/http"
-  "github.com/gorilla/context"
+	"github.com/gorilla/context"
+	"io"
+	"net/http"
 )
 
 func HandleHelloWorld(w http.ResponseWriter, r *http.Request) {
-  log := context.Get(r, "log").(*logger)
-  log.Debug("Hello, World!")
+	log := context.Get(r, "log").(*logger)
+	log.Debug("Hello, World!")
 
-  w.Header().Set("Content-Type", "text/plain")
-  io.WriteString(w, "Hello, World!")
+	w.Header().Set("Content-Type", "text/plain")
+	io.WriteString(w, "Hello, World!")
 }

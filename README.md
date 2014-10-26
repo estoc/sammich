@@ -77,3 +77,11 @@ switch err.(type) {
     // handle MyCustomerError2
 }
 ```
+
+### Before Merging
+
+Before merging, it is strongly advised that you `go fmt` your fork.
+
+```bash
+go fmt ~/workspace/chewcrew
+```

@@ -6,7 +6,6 @@ The backend REST API for chewcrew
 * Install Golang (sample script below for Ubuntu 64bit)
 * Run ./bin/getimports.sh
 * go build && ./chewcrew
-* for usage details: ./chewcrew -help
 
 ```bash
 ### Go installation script
@@ -26,3 +25,62 @@ sudo mv go /usr/local/
 export PATH=$PATH:/usr/local/go/bin
 echo "export PATH=\$PATH:/usr/local/go/bin" >> $HOME/.profile
 ```
+
+## Usage
+
+For server configurables, execute the following:
+
+```bash
+./chewcrew -help
+```
+
+### Static Assets
+
+
+Static assets are served on the root path. The absolute path of the static assets directory is available as a server configurable.
+
+### API
+
+API routes are found on the path `/api/*`. Consult the `api.raml` file for API specification.
+
+## Development Notes
+
+### Logging
+
+Server logging is available to all of `main` as `serverLog`.
+
+Each incoming API request is provided its own child logger, namespaced under the request's id.
+
+Services logging is TBD.
+
+Consult `log.go` for more information on the logger interface.
+
+### Errors
+
+Always handle and try to recover from errors! Panicing should be used sparingly (if at all).
+
+Errors originating from core or third party libraries should be wrapped via `NewMaskedError`, `NewMaskedErrorWithContext`, or `NewMaskedErrorWithContextf`. Errors originating within `main` should be initialized via `NewError` or `NewErrorf`. When creating errors via these functions, a call stack (and optional context message) is associated with the error.
+
+When logging an error directly with `log.go`, the call stack (and optional context message) will be logged alongside the error's root cause.
+
+Custom error types can be defined as so:
+```go
+type MyCustomError Error
+```
+
+Custom error types encourage maintainable error handling when multiple errors could be returned from a function that require different recovery paths.
+```go
+err := TestFunc()
+switch err.(type) {
+  MyCustomError:
+    // handle MyCustomError
+  MyCustomError2:
+    // handle MyCustomerError2
+}
+```
+
+
+
+
+
+

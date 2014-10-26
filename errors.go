@@ -9,7 +9,7 @@ import (
 const maxStackLength = 100000
 
 // A simple wrapper around native errors that also provides a stack trace and an optional context
-// message.
+// message. Implements error interface.
 type Error struct {
 	E       error
 	Context string
@@ -31,7 +31,7 @@ func (e Error) Error() string {
 }
 
 // Create an error with a basic message.
-func NewError(s string) error {
+func NewError(s string) Error {
 	err := errors.New(s)
 
 	stackBuf := make([]byte, maxStackLength, maxStackLength)
@@ -42,7 +42,7 @@ func NewError(s string) error {
 }
 
 // Create an error with a formatted message.
-func NewErrorf(f string, a ...interface{}) error {
+func NewErrorf(f string, a ...interface{}) Error {
 	err := fmt.Errorf(f, a...)
 
 	stackBuf := make([]byte, maxStackLength, maxStackLength)
@@ -54,7 +54,7 @@ func NewErrorf(f string, a ...interface{}) error {
 
 // Useful for wrapping errors received from core and third party libraries, providing them a stack
 // trace.
-func NewMaskedError(underlying error) error {
+func NewMaskedError(underlying error) Error {
 	stackBuf := make([]byte, maxStackLength, maxStackLength)
 	bytesRead := runtime.Stack(stackBuf, false)
 	stack := string(stackBuf[:bytesRead])
@@ -64,7 +64,7 @@ func NewMaskedError(underlying error) error {
 
 // Useful for wrapping errors received from core and third party libraries, providing them a stack
 // trace. Additionally, this method allows for a message to be saved for context.
-func NewMaskedErrorWithContext(underlying error, context string) error {
+func NewMaskedErrorWithContext(underlying error, context string) Error {
 	stackBuf := make([]byte, maxStackLength, maxStackLength)
 	bytesRead := runtime.Stack(stackBuf, false)
 	stack := string(stackBuf[:bytesRead])
@@ -74,7 +74,7 @@ func NewMaskedErrorWithContext(underlying error, context string) error {
 
 // Useful for wrapping errors received from core and third party libraries, providing them a stack
 // trace. Additionally, this method allows for a formatted message to be saved for context.
-func NewMaskedErrorWithContextf(underlying error, f string, a ...interface{}) error {
+func NewMaskedErrorWithContextf(underlying error, f string, a ...interface{}) Error {
 	stackBuf := make([]byte, maxStackLength, maxStackLength)
 	bytesRead := runtime.Stack(stackBuf, false)
 	stack := string(stackBuf[:bytesRead])

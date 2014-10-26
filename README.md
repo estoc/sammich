@@ -83,7 +83,7 @@ Each incoming API request is provided its own child logger, namespaced under the
 
 Services logging is TBD.
 
-Consult `log.go` for more information on the logger interface. `log.go` provides a wrapper around [go-logging](https://github.com/op/go-logging).
+Consult `Logger` for more information on the logger interface. `Logger` provides a wrapper around [go-logging](https://github.com/op/go-logging).
 
 ### Errors
 
@@ -91,7 +91,7 @@ Always handle and try to recover from errors! Panicing should be used sparingly 
 
 Errors originating from core or third party libraries should be wrapped via `NewMaskedError`, `NewMaskedErrorWithContext`, or `NewMaskedErrorWithContextf`. Errors originating within `main` should be initialized via `NewError` or `NewErrorf`. When creating errors via these functions, a call stack (and optional context message) is associated with the error.
 
-When logging an error directly with `log.go`, the call stack (and optional context message) will be logged alongside the error's root cause.
+When logging an error directly with a `Logger`, the call stack (and optional context message) will be logged alongside the error's root cause.
 
 Custom error types can be defined as so:
 ```go

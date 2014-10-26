@@ -49,11 +49,11 @@ API routes are found on the path `/api/*`. Consult the `api.raml` file for API s
 
 Server logging is available to all of `main` as `serverLog`.
 
-Each incoming API request is provided its own child logger, namespaced under the request's id.
+Each incoming API request is provided its own child logger, namespaced under the request's id. This child logger is available on the request's context. See gorilla toolkit documentation for more information on [contexts](http://www.gorillatoolkit.org/pkg/context).
 
 Services logging is TBD.
 
-Consult `log.go` for more information on the logger interface.
+Consult `log.go` for more information on the logger interface. `log.go` provides a wrapper around [go-logging](https://github.com/op/go-logging).
 
 ### Errors
 
@@ -78,9 +78,3 @@ switch err.(type) {
     // handle MyCustomerError2
 }
 ```
-
-
-
-
-
-

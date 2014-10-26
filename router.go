@@ -9,10 +9,8 @@ import (
 // A common type used to express what middleware and route handler function signatures look like
 type HttpHandler func(w http.ResponseWriter, r *http.Request)
 
-/*
-The MethodRouter type provides a convenience wrapper around mux.Router that provides easy-to-use
-http method-based routing.
-*/
+// The MethodRouter type provides a convenience wrapper around mux.Router that provides easy-to-use
+// http method-based routing.
 type MethodRouter struct {
 	methods       []string
 	primaryRouter *mux.Router
@@ -32,12 +30,10 @@ func NewMethodRouter() *MethodRouter {
 	return router
 }
 
-/*
-Register a route. See mux.Router documentation for regexp path rules, etc.
-
-This method also wraps the provided handler with a decorator middleware and a middleware that
+// Register a route. See mux.Router documentation for regexp path rules, etc.
+//
+// This method also wraps the provided handler with a decorator middleware and a middleware that
 clears the request context.
-*/
 func (mr MethodRouter) HandleFunc(method string, path string, handleFunc HttpHandler) {
 	serverLog.Info("Registering api route [%s /api%s]", method, path)
 	mr.subRouters[method].HandleFunc(path, DecoratorMdw(CleanupMdw(handleFunc)))

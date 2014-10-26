@@ -6,12 +6,10 @@ import (
 	"net/http"
 )
 
-/*
-Returns a middleware function that calls the next handler.
+// Returns a middleware function that calls the next handler.
 
-This middleware function is executed for each incoming request and decorates the
-req/res combination with necessary facilities like unique ids and logging facilities.
-*/
+// This middleware function is executed for each incoming request and decorates the
+// req/res combination with necessary facilities like unique ids and logging facilities.
 func DecoratorMdw(next HttpHandler) HttpHandler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// attach a unique id to the request
@@ -36,10 +34,8 @@ func DecoratorMdw(next HttpHandler) HttpHandler {
 	}
 }
 
-/*
-Returns a middleware that cleans up that request context and wraps http.ResponseWriter so that
-we can log outgoing requests.
-*/
+// Returns a middleware that cleans up that request context and wraps http.ResponseWriter so that
+// we can log outgoing requests.
 func CleanupMdw(next HttpHandler) HttpHandler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := context.Get(r, "log").(*logger)
@@ -51,9 +47,7 @@ func CleanupMdw(next HttpHandler) HttpHandler {
 	}
 }
 
-/*
-Implements the http.ResponseWriter interface, providing us a way to log outgoing requests.
-*/
+//Implements the http.ResponseWriter interface, providing us a way to log outgoing requests.
 type loggedResponseWriter struct {
 	w      http.ResponseWriter
 	r      *http.Request

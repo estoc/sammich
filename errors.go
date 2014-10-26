@@ -8,10 +8,8 @@ import (
 
 const maxStackLength = 100000
 
-/*
-A simple wrapper around native errors that also provides a stack trace and an optional context
-message.
-*/
+// A simple wrapper around native errors that also provides a stack trace and an optional context
+// message.
 type Error struct {
 	e       error
 	context string
@@ -54,10 +52,8 @@ func NewErrorf(f string, a ...interface{}) error {
 	return Error{err, "", stack}
 }
 
-/*
-Useful for wrapping errors received from core and third party libraries, providing them a stack
-trace.
-*/
+// Useful for wrapping errors received from core and third party libraries, providing them a stack
+// trace.
 func NewMaskedError(underlying error) error {
 	stackBuf := make([]byte, maxStackLength, maxStackLength)
 	bytesRead := runtime.Stack(stackBuf, false)
@@ -66,10 +62,8 @@ func NewMaskedError(underlying error) error {
 	return Error{underlying, "", stack}
 }
 
-/*
-Useful for wrapping errors received from core and third party libraries, providing them a stack
-trace. Additionally, this method allows for a message to be saved for context.
-*/
+// Useful for wrapping errors received from core and third party libraries, providing them a stack
+// trace. Additionally, this method allows for a message to be saved for context.
 func NewMaskedErrorWithContext(underlying error, context string) error {
 	stackBuf := make([]byte, maxStackLength, maxStackLength)
 	bytesRead := runtime.Stack(stackBuf, false)
@@ -78,10 +72,8 @@ func NewMaskedErrorWithContext(underlying error, context string) error {
 	return Error{underlying, context, stack}
 }
 
-/*
-Useful for wrapping errors received from core and third party libraries, providing them a stack
-trace. Additionally, this method allows for a formatted message to be saved for context.
-*/
+// Useful for wrapping errors received from core and third party libraries, providing them a stack
+// trace. Additionally, this method allows for a formatted message to be saved for context.
 func NewMaskedErrorWithContextf(underlying error, f string, a ...interface{}) error {
 	stackBuf := make([]byte, maxStackLength, maxStackLength)
 	bytesRead := runtime.Stack(stackBuf, false)

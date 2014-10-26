@@ -14,11 +14,9 @@ const (
 	logFormat = "%{color}%{level} %{module} %{color:reset}%{message}"
 )
 
-/*
-A simple wrapper around the go-logging library that allows us to easily create child loggers.
-
-TODO: support filesystem logging
-*/
+// A simple wrapper around the go-logging library that allows us to easily create child loggers.
+//
+// TODO: support filesystem logging
 type logger struct {
 	libLogger *logging.Logger
 	level     int
@@ -77,20 +75,18 @@ func (l *logger) Debug(args ...interface{}) {
 	l.logAtLevel("DEBUG", getLogCallerPath(2), args...)
 }
 
-/*
-Internally used method that allows us to leverage the go-logging library while enabling a more
-robust and expressive logging interface. Each logging level (see public methods above) has three
-available interfaces:
-  - logAtLevel(format string, args interface{}...)
-    - log a format string. args is optional.
-  - logAtLevel(err error)
-    - log an error. the error's message. if using main.Error, a stack and context message (if set)
-    will also be provided.
-  - logAtLevel(struct interface{}, format string, args interface{}...)
-    - log a struct alongside a format string. args is optional. the struct will be marshalled to
-    json so that it can be pretty printed. if marshalling fails, an error will be logged at the
-    server level and will immediately return.
-*/
+// Internally used method that allows us to leverage the go-logging library while enabling a more
+// robust and expressive logging interface. Each logging level (see public methods above) has three
+// available interfaces:
+//   - logAtLevel(format string, args interface{}...)
+//     - log a format string. args is optional.
+//   - logAtLevel(err error)
+//     - log an error. the error's message. if using main.Error, a stack and context message (if set)
+//     will also be provided.
+//   - logAtLevel(struct interface{}, format string, args interface{}...)
+//     - log a struct alongside a format string. args is optional. the struct will be marshalled to
+//     json so that it can be pretty printed. if marshalling fails, an error will be logged at the
+//     server level and will immediately return.
 func (l *logger) logAtLevel(level string, caller string, args ...interface{}) {
 	var format string
 	var formatArgs []interface{}

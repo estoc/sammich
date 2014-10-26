@@ -57,10 +57,12 @@ API routes are found on the path `/api/*`. Consult the `api.raml` file for API s
 
 ## Documentation
 
+Hosted documentation for the master branch is found [here](http://godoc.org/github.com/wafflehaus/chewcrew).
+
+Or, you can host your documentation locally:
 ```bash
 godoc -http=:6060
 ```
-
 Open [http://localhost:6060/pkg/github.com/wafflehaus/chewcrew](http://localhost:6060/pkg/github.com/wafflehaus/chewcrew) in your browser.
 
 ### Before Merging

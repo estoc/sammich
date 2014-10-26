@@ -21,7 +21,7 @@ func DecoratorMdw(next HttpHandler) HttpHandler {
     reqLog, err := serverLog.Child(uuidv4)
     if err != nil {
       msg := "failed to attach request logger"
-      reqLog.Error(NewMaskedErrorf(err, msg))
+      reqLog.Error(NewMaskedErrorWithContext(err, msg))
       http.Error(w, msg, http.StatusInternalServerError)
       return
     }

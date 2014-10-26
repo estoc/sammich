@@ -62,9 +62,19 @@ func NewMaskedError(underlying error) error {
 }
 
 // useful for wrapping errors received from core and third party libraries, providing them stack
+// traces. additionally, this method allows for an additional message to be saved for context.
+func NewMaskedErrorWithContext(underlying error, context string) error {
+  stackBuf := make([]byte, maxStackLength, maxStackLength)
+  bytesRead := runtime.Stack(stackBuf, false)
+  stack := string(stackBuf[:bytesRead])
+
+  return Error{underlying, context, stack}
+}
+
+// useful for wrapping errors received from core and third party libraries, providing them stack
 // traces. additionally, this method allows for an additional formatted message to be saved for
 // context.
-func NewMaskedErrorf(underlying error, f string, a ...interface{}) error {
+func NewMaskedErrorWithContextf(underlying error, f string, a ...interface{}) error {
   stackBuf := make([]byte, maxStackLength, maxStackLength)
   bytesRead := runtime.Stack(stackBuf, false)
   stack := string(stackBuf[:bytesRead])

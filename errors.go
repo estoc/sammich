@@ -12,7 +12,7 @@ const maxStackLength = 100000
 // message.
 type Error struct {
 	e       error
-	context string
+	Context string
 	Stack   string
 }
 
@@ -20,8 +20,8 @@ func (e Error) Error() string {
 	s := ""
 
 	// prefix with context if there is one
-	if e.context != "" {
-		s = e.context + " : "
+	if e.Context != "" {
+		s = e.Context + " : "
 	}
 
 	// provide error message and stack

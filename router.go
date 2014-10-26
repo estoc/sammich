@@ -35,14 +35,14 @@ func NewMethodRouter() *MethodRouter {
 // This method also wraps the provided handler with a decorator middleware and a middleware that
 // clears the request context.
 func (mr MethodRouter) HandleFunc(method string, path string, handleFunc HttpHandler) {
-	serverLog.Info("Registering api route [%s /api%s]", method, path)
+	ServerLog.Info("Registering api route [%s /api%s]", method, path)
 	mr.subRouters[method].HandleFunc(path, DecoratorMdw(CleanupMdw(handleFunc)))
 	return
 }
 
 // Serve static content from an absolute path on the fs
 func (mr MethodRouter) ServeStatic(dirPath string) {
-	serverLog.Info("Serving statics assets from \"%s\"", dirPath)
+	ServerLog.Info("Serving statics assets from \"%s\"", dirPath)
 	mr.primaryRouter.PathPrefix("/").Handler(http.FileServer(http.Dir(dirPath)))
 }
 

@@ -13,8 +13,8 @@ func main() {
 
 	// start server logger
 	level := *logLevel
-	serverLog = NewServerLogger(level, logFormat)
-	serverLog.Debug("Server logging configured.")
+	ServerLog = NewServerLogger(level, logFormat)
+	ServerLog.Debug("Server logging configured.")
 
 	// initialize router
 	router := NewMethodRouter()
@@ -29,7 +29,7 @@ func main() {
 
 	// TODO: move to http.Server instantiation if we need TLS
 	p := ":" + *port
-	serverLog.Info("Starting server on %s", p)
+	ServerLog.Info("Starting server on %s", p)
 	router.ListenAndServe(p)
 
 	return

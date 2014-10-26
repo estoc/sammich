@@ -18,7 +18,7 @@ func DecoratorMdw(next HttpHandler) HttpHandler {
 		w.Header().Set("X-Request-Id", uuidv4)
 
 		// attach logger to request context
-		reqLog, err := serverLog.Child(uuidv4)
+		reqLog, err := ServerLog.Child(uuidv4)
 		if err != nil {
 			msg := "failed to attach request logger"
 			reqLog.Error(NewMaskedErrorWithContext(err, msg))
@@ -38,27 +38,27 @@ func DecoratorMdw(next HttpHandler) HttpHandler {
 // we can log outgoing requests.
 func CleanupMdw(next HttpHandler) HttpHandler {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log := context.Get(r, "log").(*logger)
+		log := context.Get(r, "log").(*Logger)
 
 		// wrap our response writer so that we can log when the request leaves the system
-		next(&loggedResponseWriter{w: w, r: r, log: log}, r)
+		next(&LoggedResponseWriter{w: w, r: r, log: log}, r)
 
 		context.Clear(r)
 	}
 }
 
 //Implements the http.ResponseWriter interface, providing us a way to log outgoing requests.
-type loggedResponseWriter struct {
+type LoggedResponseWriter struct {
 	w      http.ResponseWriter
 	r      *http.Request
-	log    *logger
+	log    *Logger
 	status int
 }
 
-func (w *loggedResponseWriter) Header() http.Header {
+func (w *LoggedResponseWriter) Header() http.Header {
 	return w.w.Header()
 }
-func (w *loggedResponseWriter) Write(d []byte) (int, error) {
+func (w *LoggedResponseWriter) Write(d []byte) (int, error) {
 	// if i never explicitly called WriteHeader, status code will be 200
 	if w.status == 0 {
 		w.WriteHeader(200)
@@ -69,7 +69,7 @@ func (w *loggedResponseWriter) Write(d []byte) (int, error) {
 
 	return w.w.Write(d)
 }
-func (w *loggedResponseWriter) WriteHeader(status int) {
+func (w *LoggedResponseWriter) WriteHeader(status int) {
 	w.status = status
 	w.w.WriteHeader(status)
 }

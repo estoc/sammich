@@ -7,9 +7,6 @@ import (
 	"runtime"
 )
 
-// Globally available server log.
-var serverLog *logger = nil
-
 const (
 	logFormat = "%{color}%{level} %{module} %{color:reset}%{message}"
 )
@@ -17,15 +14,18 @@ const (
 // A simple wrapper around the go-logging library that allows us to easily create child loggers.
 //
 // TODO: support filesystem logging
-type logger struct {
+type Logger struct {
 	libLogger *logging.Logger
 	level     int
 }
 
+// Globally available server log.
+var ServerLog *Logger = nil
+
 // Get a new server logger.
-func NewServerLogger(logLevel int, logFormat string) *logger {
+func NewServerLogger(logLevel int, logFormat string) *Logger {
 	libLogger := logging.MustGetLogger("server")
-	logger := &logger{libLogger, logLevel}
+	logger := &Logger{libLogger, logLevel}
 
 	logging.SetFormatter(logging.MustStringFormatter(logFormat))
 
@@ -34,60 +34,60 @@ func NewServerLogger(logLevel int, logFormat string) *logger {
 }
 
 // Get a child logger.
-func (l *logger) Child(name string) (*logger, error) {
+func (l *Logger) Child(name string) (*Logger, error) {
 	libLogger, err := logging.GetLogger(name)
 	if err != nil {
 		return nil, err
 	}
 
-	child := &logger{libLogger, l.level}
+	child := &Logger{libLogger, l.level}
 	logging.SetLevel(logging.Level(l.level), name)
 	return child, nil
 }
 
-// Log at critical level. See *logger.logAtLevel for usage details
-func (l *logger) Critical(args ...interface{}) {
-	l.logAtLevel("CRITICAL", getLogCallerPath(2), args...)
+// Log at critical level. See *Logger.LogAtLevel for usage details
+func (l *Logger) Critical(args ...interface{}) {
+	l.LogAtLevel("CRITICAL", getLogCallerPath(2), args...)
 }
 
-// Log at error level. See *logger.logAtLevel for usage details
-func (l *logger) Error(args ...interface{}) {
-	l.logAtLevel("ERROR", getLogCallerPath(2), args...)
+// Log at error level. See *Logger.LogAtLevel for usage details
+func (l *Logger) Error(args ...interface{}) {
+	l.LogAtLevel("ERROR", getLogCallerPath(2), args...)
 }
 
-// Log at warning level. See *logger.logAtLevel for usage details
-func (l *logger) Warning(args ...interface{}) {
-	l.logAtLevel("WARNING", getLogCallerPath(2), args...)
+// Log at warning level. See *Logger.LogAtLevel for usage details
+func (l *Logger) Warning(args ...interface{}) {
+	l.LogAtLevel("WARNING", getLogCallerPath(2), args...)
 }
 
-// Log at notice level. See *logger.logAtLevel for usage details
-func (l *logger) Notice(args ...interface{}) {
-	l.logAtLevel("NOTICE", getLogCallerPath(2), args...)
+// Log at notice level. See *Logger.LogAtLevel for usage details
+func (l *Logger) Notice(args ...interface{}) {
+	l.LogAtLevel("NOTICE", getLogCallerPath(2), args...)
 }
 
-// Log at info level. See *logger.logAtLevel for usage details
-func (l *logger) Info(args ...interface{}) {
-	l.logAtLevel("INFO", getLogCallerPath(2), args...)
+// Log at info level. See *Logger.LogAtLevel for usage details
+func (l *Logger) Info(args ...interface{}) {
+	l.LogAtLevel("INFO", getLogCallerPath(2), args...)
 }
 
-// Log at debug level. See *logger.logAtLevel for usage details
-func (l *logger) Debug(args ...interface{}) {
-	l.logAtLevel("DEBUG", getLogCallerPath(2), args...)
+// Log at debug level. See *Logger.LogAtLevel for usage details
+func (l *Logger) Debug(args ...interface{}) {
+	l.LogAtLevel("DEBUG", getLogCallerPath(2), args...)
 }
 
 // Internally used method that allows us to leverage the go-logging library while enabling a more
 // robust and expressive logging interface. Each logging level (see public methods above) has three
 // available interfaces:
-//   - logAtLevel(format string, args interface{}...)
+//   - LogAtLevel(level string, caller string, format string, args interface{}...)
 //     - log a format string. args is optional.
-//   - logAtLevel(err error)
+//   - LogAtLevel(level string, caller string, err error)
 //     - log an error. the error's message. if using main.Error, a stack and context message (if set)
 //     will also be provided.
-//   - logAtLevel(struct interface{}, format string, args interface{}...)
+//   - LogAtLevel(level string, caller string, struct interface{}, format string, args interface{}...)
 //     - log a struct alongside a format string. args is optional. the struct will be marshalled to
 //     json so that it can be pretty printed. if marshalling fails, an error will be logged at the
 //     server level and will immediately return.
-func (l *logger) logAtLevel(level string, caller string, args ...interface{}) {
+func (l *Logger) LogAtLevel(level string, caller string, args ...interface{}) {
 	var format string
 	var formatArgs []interface{}
 
@@ -101,7 +101,7 @@ func (l *logger) logAtLevel(level string, caller string, args ...interface{}) {
 	default: // recvd a struct, formatted string [and args].. will attempt to marshall to json
 		marshalled, err := json.MarshalIndent(args[0], "", "    ")
 		if err != nil {
-			serverLog.Error("an error occurred when marshalling a struct for logging: %s", err)
+			ServerLog.Error("an error occurred when marshalling a struct for logging: %s", err)
 			return
 		}
 		format = "%s: " + args[1].(string) + "\n%s"

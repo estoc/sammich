@@ -77,7 +77,7 @@ go fmt github.com/wafflehaus/chewcrew
 
 ### Logging
 
-Server logging is available to all of `main` as `serverLog`.
+Server logging is available as `ServerLog`.
 
 Each incoming API request is provided its own child logger, namespaced under the request's id. This child logger is available on the request's context. See gorilla toolkit documentation for more information on [contexts](http://www.gorillatoolkit.org/pkg/context).
 

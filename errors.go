@@ -8,7 +8,10 @@ import (
 
 const maxStackLength = 100000
 
-// a simple wrapper around native errors that also provides a stack trace
+/*
+A simple wrapper around native errors that also provides a stack trace and an optional context
+message.
+*/
 type Error struct {
   e error
   context string
@@ -29,7 +32,7 @@ func (e Error) Error() string {
   return s
 }
 
-// create an error with a basic message
+// Create an error with a basic message.
 func NewError(s string) error {
   err := errors.New(s)
 
@@ -40,7 +43,7 @@ func NewError(s string) error {
   return Error{err, "", stack}
 }
 
-// create an error with a formatted message
+// Create an error with a formatted message.
 func NewErrorf(f string, a ...interface{}) error {
   err := fmt.Errorf(f, a...)
 
@@ -51,8 +54,10 @@ func NewErrorf(f string, a ...interface{}) error {
   return Error{err, "", stack}
 }
 
-// useful for wrapping errors received from core and third party libraries, providing them stack
-// traces
+/*
+Useful for wrapping errors received from core and third party libraries, providing them a stack
+trace.
+*/
 func NewMaskedError(underlying error) error {
   stackBuf := make([]byte, maxStackLength, maxStackLength)
   bytesRead := runtime.Stack(stackBuf, false)
@@ -61,8 +66,10 @@ func NewMaskedError(underlying error) error {
   return Error{underlying, "", stack}
 }
 
-// useful for wrapping errors received from core and third party libraries, providing them stack
-// traces. additionally, this method allows for an additional message to be saved for context.
+/*
+Useful for wrapping errors received from core and third party libraries, providing them a stack
+trace. Additionally, this method allows for a message to be saved for context.
+*/
 func NewMaskedErrorWithContext(underlying error, context string) error {
   stackBuf := make([]byte, maxStackLength, maxStackLength)
   bytesRead := runtime.Stack(stackBuf, false)
@@ -71,9 +78,11 @@ func NewMaskedErrorWithContext(underlying error, context string) error {
   return Error{underlying, context, stack}
 }
 
-// useful for wrapping errors received from core and third party libraries, providing them stack
-// traces. additionally, this method allows for an additional formatted message to be saved for
-// context.
+
+/*
+Useful for wrapping errors received from core and third party libraries, providing them a stack
+trace. Additionally, this method allows for a formatted message to be saved for context.
+*/
 func NewMaskedErrorWithContextf(underlying error, f string, a ...interface{}) error {
   stackBuf := make([]byte, maxStackLength, maxStackLength)
   bytesRead := runtime.Stack(stackBuf, false)

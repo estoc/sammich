@@ -1,5 +1,6 @@
 #!/bin/bash
 echo Fetching imports for chewcrew...
+go get code.google.com/p/go.tools/cmd/godoc
 go get github.com/gorilla/mux
 go get github.com/gorilla/feeds
 go get github.com/gorilla/context

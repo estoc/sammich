@@ -44,7 +44,7 @@ echo "export PATH=\$PATH:/usr/local/go/bin" >> $HOME/.profile
 For server configurables, execute the following:
 
 ```bash
-go install github.com/wafflehaus/chewcrew && $GOPATH/bin/chewcrew -help
+go install github.com/wafflehaus/chewcrew && chewcrew -help
 ```
 
 ### Static Assets

@@ -14,7 +14,7 @@ $GOPATH/src/github.com/wafflehaus/chewcrew/bin/getimports.sh
 ```
 * Compile the code and start the server!
 ```bash
-go install github.com/wafflehaus/chewcrew && $GOPATH/bin/chewcrew
+go install github.com/wafflehaus/chewcrew && chewcrew
 ```
 
 ## Installing Go

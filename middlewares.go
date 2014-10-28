@@ -1,4 +1,4 @@
-package chewcrew
+package main
 
 import (
 	"github.com/gorilla/context"

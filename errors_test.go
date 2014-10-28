@@ -3,15 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"testing"
 )
-
-func AssertIsError(err error, t *testing.T) {
-	if found := reflect.TypeOf(err); found != reflect.TypeOf(Error{}) {
-		t.Errorf("expected type of Error, but found %s", found)
-	}
-}
 
 func AssertContextNil(err Error, t *testing.T) {
 	if found := err.Context; found != "" {
@@ -41,7 +34,6 @@ func TestNewError(t *testing.T) {
 	msg := "test error"
 	err := NewError(msg)
 
-	AssertIsError(err, t)
 	AssertMessage(msg, err, t)
 	AssertStack(err, t)
 	AssertContextNil(err, t)
@@ -54,7 +46,6 @@ func TestNewErrorf(t *testing.T) {
 	err := NewErrorf(format, one, two)
 	fmtdMessage := fmt.Sprintf(format, one, two)
 
-	AssertIsError(err, t)
 	AssertMessage(fmtdMessage, err, t)
 	AssertStack(err, t)
 	AssertContextNil(err, t)
@@ -65,7 +56,6 @@ func TestNewMaskedError(t *testing.T) {
 	underlying := errors.New(msg)
 	err := NewMaskedError(underlying)
 
-	AssertIsError(err, t)
 	AssertMessage(msg, err, t)
 	AssertStack(err, t)
 	AssertContextNil(err, t)
@@ -77,7 +67,6 @@ func TestNewMaskedErrorWithContext(t *testing.T) {
 	context := "my context"
 	err := NewMaskedErrorWithContext(underlying, context)
 
-	AssertIsError(err, t)
 	AssertMessage(msg, err, t)
 	AssertStack(err, t)
 	AssertContext(context, err, t)
@@ -93,7 +82,6 @@ func TestNewMaskedErrorWithContextf(t *testing.T) {
 	err := NewMaskedErrorWithContextf(underlying, format, one, two)
 	fmtdContext := fmt.Sprintf(format, one, two)
 
-	AssertIsError(err, t)
 	AssertMessage(msg, err, t)
 	AssertStack(err, t)
 	AssertContext(fmtdContext, err, t)

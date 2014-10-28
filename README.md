@@ -61,16 +61,6 @@ API routes are found on the path `/api/*`. Consult the `api.raml` file for API s
 go test github.com/wafflehaus/chewcrew
 ```
 
-## Documentation
-
-Hosted documentation for master is found [here](http://godoc.org/github.com/wafflehaus/chewcrew).
-
-Or, you can host your documentation locally:
-```bash
-godoc -http=:6060
-```
-Open [http://localhost:6060/pkg/github.com/wafflehaus/chewcrew](http://localhost:6060/pkg/github.com/wafflehaus/chewcrew) in your browser.
-
 ## Before Merging
 
 Before merging, it is strongly advised that you `go fmt` your fork.

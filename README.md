@@ -12,7 +12,7 @@ gvm install go1.3.3
 ```bash
 gvm use go1.3.3
 git clone git://github.com/wafflehaus/chewcrew.git $GOPATH/src/github.com/wafflehaus/chewcrew
-$GOPATH/src/github.com/wafflehaus/chewcrew/bin/getimports.sh
+go get github.com/wafflehaus/chewcrew
 go install github.com/wafflehaus/chewcrew
 chewcrew
 ```
@@ -35,18 +35,13 @@ API routes are found on the path `/api/*`. Consult the `api.raml` file for API s
 
 ## Development
 
-### Running Tests
-
-```bash
-go test github.com/wafflehaus/chewcrew
-```
-
 ### Before Merging
 
-Before merging, it is strongly advised that you `go fmt` your fork.
+Before merging, format and test your code.
 
 ```bash
 go fmt github.com/wafflehaus/chewcrew
+go test github.com/wafflehaus/chewcrew
 ```
 
 ### Logging

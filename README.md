@@ -55,6 +55,12 @@ Static assets are served on the root path. The absolute path of the static asset
 
 API routes are found on the path `/api/*`. Consult the `api.raml` file for API specification.
 
+## Running Tests
+
+```bash
+go test github.com/wafflehaus/chewcrew
+```
+
 ## Documentation
 
 Hosted documentation for master is found [here](http://godoc.org/github.com/wafflehaus/chewcrew).

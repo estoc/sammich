@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	mux "github.com/gorilla/mux"
 )
 
 // A common type used to express what middleware and route handler function signatures look like

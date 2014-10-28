@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gorilla/context"
 	"io"
 	"net/http"
+
+	context "github.com/gorilla/context"
 )
 
 func HandleHelloWorld(w http.ResponseWriter, r *http.Request) {

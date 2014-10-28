@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gorilla/context"
-	"github.com/gorilla/feeds"
 	"net/http"
+
+	context "github.com/gorilla/context"
+	feeds "github.com/gorilla/feeds"
 )
 
 // Returns a middleware function that calls the next handler.
@@ -55,9 +56,6 @@ type LoggedResponseWriter struct {
 	status int
 }
 
-func (w *LoggedResponseWriter) Header() http.Header {
-	return w.w.Header()
-}
 func (w *LoggedResponseWriter) Write(d []byte) (int, error) {
 	// if i never explicitly called WriteHeader, status code will be 200
 	if w.status == 0 {
@@ -69,7 +67,12 @@ func (w *LoggedResponseWriter) Write(d []byte) (int, error) {
 
 	return w.w.Write(d)
 }
+
 func (w *LoggedResponseWriter) WriteHeader(status int) {
 	w.status = status
 	w.w.WriteHeader(status)
+}
+
+func (w *LoggedResponseWriter) Header() http.Header {
+	return w.w.Header()
 }

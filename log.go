@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	logging "github.com/op/go-logging"
 	"runtime"
+
+	logging "github.com/op/go-logging"
 )
 
 const (

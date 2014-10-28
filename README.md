@@ -1,50 +1,27 @@
-# chewcrew server
-
-The backend REST API for chewcrew
+# ChewCrew Core
 
 ## Getting Started
-* Get the code
+
+* Install Go using [gvm](https://github.com/moovweb/gvm)
 ```bash
+bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+gvm install go1.3.3
+```
+
+* Install chewcrew
+```bash
+gvm use go1.3.3
 git clone git://github.com/wafflehaus/chewcrew.git $GOPATH/src/github.com/wafflehaus/chewcrew
-```
-
-* Get dependencies
-```bash
 $GOPATH/src/github.com/wafflehaus/chewcrew/bin/getimports.sh
-```
-* Compile the code and start the server!
-```bash
-go install github.com/wafflehaus/chewcrew && chewcrew
-```
-
-## Installing Go
-Use [gvm](https://github.com/moovweb/gvm), or install Golang (sample script below for Ubuntu 64bit). Installing from gvm is advised due to the simplicity.
-
-```bash
-### Go installation script
-# Remove previous go installations
-sudo rm -r /usr/local/go
-cd /tmp
-sudo rm -r go
-
-# Download go (Update the version/OS here)
-wget https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz
-tar -zxf go1.3.3.linux-amd64.tar.gz
-
-# Move go folder to default folder /usr/local
-sudo mv go /usr/local/
-
-# Add to path and .profile (comment out if updating)
-export PATH=$PATH:/usr/local/go/bin
-echo "export PATH=\$PATH:/usr/local/go/bin" >> $HOME/.profile
+go install github.com/wafflehaus/chewcrew
+chewcrew
 ```
 
 ## Usage
 
-For server configurables, execute the following:
-
+For server configurables, run
 ```bash
-go install github.com/wafflehaus/chewcrew && chewcrew -help
+chewcrew -help
 ```
 
 ### Static Assets
@@ -55,21 +32,22 @@ Static assets are served on the root path. The absolute path of the static asset
 
 API routes are found on the path `/api/*`. Consult the `api.raml` file for API specification.
 
-## Running Tests
+
+## Development
+
+### Running Tests
 
 ```bash
 go test github.com/wafflehaus/chewcrew
 ```
 
-## Before Merging
+### Before Merging
 
 Before merging, it is strongly advised that you `go fmt` your fork.
 
 ```bash
 go fmt github.com/wafflehaus/chewcrew
 ```
-
-## Development Notes
 
 ### Logging
 

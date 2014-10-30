@@ -32,8 +32,14 @@ Static assets are served on the root path. The absolute path of the static asset
 
 API routes are found on the path `/api/*`. Consult the `api.raml` file for API specification.
 
-
 ## Development
+
+The server is highly dependent on the following dependencies, so it would be best to be somewhat familiar with them:
+* [gorillatoolkit:context](http://www.gorillatoolkit.org/pkg/context)
+  * used to decorate the request with universal facilities like a request logger
+* [httprouter](https://github.com/julienschmidt/httprouter)
+  * routing
+  * uri and query string access
 
 ### Before Merging
 

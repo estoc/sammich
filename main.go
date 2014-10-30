@@ -2,7 +2,13 @@ package main
 
 import (
 	"flag"
+	router "github.com/julienschmidt/httprouter"
+	"net/http"
 )
+
+func AllRoutes(route router.Handle) router.Handle {
+	return DecoratorMdw(CleanupMdw(route))
+}
 
 func main() {
 	// parse command line args
@@ -17,20 +23,21 @@ func main() {
 	ServerLog.Debug("Server logging configured.")
 
 	// initialize router
-	router := NewMethodRouter()
+	router := router.New()
 
 	// provide static assets
-	// served from root path
-	router.ServeStatic(*assetsDir)
+	// served from /assets/ path
+	router.ServeFiles("/assets/*filepath", http.Dir(*assetsDir))
 
 	// register api routes
 	// served from "/api" path
-	router.HandleFunc("GET", "/", HandleHelloWorld) // GET /api/
+	router.Handle("GET", "/api", AllRoutes(HandleHelloWorld)) // GET /api/
 
 	// TODO: move to http.Server instantiation if we need TLS
 	p := ":" + *port
 	ServerLog.Info("Starting server on %s", p)
-	router.ListenAndServe(p)
+
+	ServerLog.Critical(http.ListenAndServe(p, router))
 
 	return
 }

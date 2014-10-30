@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	context "github.com/gorilla/context"
+	router "github.com/julienschmidt/httprouter"
 )
 
-func HandleHelloWorld(w http.ResponseWriter, r *http.Request) {
+func HandleHelloWorld(w http.ResponseWriter, r *http.Request, _ router.Params) {
 	log := context.Get(r, "log").(*Logger)
 	log.Debug("Hello, World!")
 

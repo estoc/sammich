@@ -6,10 +6,6 @@ import (
 	"net/http"
 )
 
-func AllRoutes(route router.Handle) router.Handle {
-	return DecoratorMdw(CleanupMdw(route))
-}
-
 func main() {
 	// parse command line args
 	assetsDir := flag.String("assetsDir", ".", "the absolute path to static assets. defaults to working directory.")
@@ -31,7 +27,7 @@ func main() {
 
 	// register api routes
 	// served from "/api" path
-	router.Handle("GET", "/api", AllRoutes(HandleHelloWorld)) // GET /api/
+	router.Handle("GET", "/api", API(HandleHelloWorld)) // GET /api/
 
 	// TODO: move to http.Server instantiation if we need TLS
 	p := ":" + *port

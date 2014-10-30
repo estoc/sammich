@@ -8,10 +8,13 @@ import (
 	router "github.com/julienschmidt/httprouter"
 )
 
-// Returns a middleware function that calls the next handler.
+// Returns a common handler chain for all API requests
+func API(next router.Handle) router.Handle {
+	return DecoratorMdw(CleanupMdw(next))
+}
 
 // This middleware function is executed for each incoming request and decorates the
-// req/res combination with necessary facilities like unique ids and logging facilities.
+// request/response combination with necessary facilities like unique ids and a child logger.
 func DecoratorMdw(next router.Handle) router.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p router.Params) {
 		// attach a unique id to the request

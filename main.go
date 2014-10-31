@@ -2,38 +2,63 @@ package main
 
 import (
 	"flag"
-	router "github.com/julienschmidt/httprouter"
 	"net/http"
+	"os"
+
+	log "github.com/Sirupsen/logrus"
+	db "github.com/dancannon/gorethink"
+	router "github.com/julienschmidt/httprouter"
+	chain "github.com/yageek/shttap"
 )
+
+var session *db.Session
 
 func main() {
 	// parse command line args
-	assetsDir := flag.String("assetsDir", ".", "the absolute path to static assets. defaults to working directory.")
-	logLevel := flag.Int("logLevel", 5, "index of server logging level. levels: [CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG]. defaults to 5 (DEBUG).")
+	logLevel := flag.String("logLevel", "debug", "index of server logging level. levels: [debug, info, warning, error, fatal, panic]. defaults to debug.")
 	port := flag.String("port", "8080", "desired port to listen on. defaults to 8080.")
 	flag.Parse()
 
-	// start server logger
-	level := *logLevel
-	ServerLog = NewServerLogger(level, logFormat)
-	ServerLog.Debug("Server logging configured.")
+	configureLogger(*logLevel)
+	session = connectToDatabase()
+	server := buildServer()
 
-	// initialize router
+	// start server
+	log.Info("Starting server on port ", *port)
+	log.Fatal(http.ListenAndServe(":"+*port, server))
+}
+
+func configureLogger(level string) {
+	log.SetFormatter(&log.TextFormatter{})
+	log.SetOutput(os.Stderr)
+	lvl, _ := log.ParseLevel(level)
+	log.SetLevel(lvl)
+}
+
+func connectToDatabase() *db.Session {
+	log.Info("Connecting to database...")
+	session, err := db.Connect(db.ConnectOpts{
+		Address:  "chewcrew.cc:28015",
+		Database: "chewcrew",
+		MaxIdle:  20,
+	})
+	if err != nil {
+		log.Fatal(NewError(err.Error()))
+	}
+	log.Info("Connected to database ", session)
+	return session
+}
+
+func buildServer() *chain.Stack {
+	// build router
 	router := router.New()
+	router.GET("/ping", RtePing)
+	router.GET("/hello/:name", RteHelloWorld)
+	router.GET("/preferences/categories", RteGetCategories)
 
-	// provide static assets
-	// served from /assets/ path
-	router.ServeFiles("/assets/*filepath", http.Dir(*assetsDir))
-
-	// register api routes
-	// served from "/api" path
-	router.Handle("GET", "/api", API(HandleHelloWorld)) // GET /api/
-
-	// TODO: move to http.Server instantiation if we need TLS
-	p := ":" + *port
-	ServerLog.Info("Starting server on %s", p)
-
-	ServerLog.Critical(http.ListenAndServe(p, router))
-
-	return
+	// chain middleware
+	stack := chain.NewStack()
+	stack.Use(MdwId, MdwLog)
+	stack.UseRouter(router)
+	return stack
 }

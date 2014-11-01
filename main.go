@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/http"
 	"os"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	db "github.com/dancannon/gorethink"
@@ -38,12 +39,14 @@ func configureLogger(level string) {
 func connectToDatabase() *db.Session {
 	log.Info("Connecting to database...")
 	session, err := db.Connect(db.ConnectOpts{
-		Address:  "chewcrew.cc:28015",
-		Database: "chewcrew",
-		MaxIdle:  20,
+		Address:     "chewcrew.cc:28015",
+		Database:    "chewcrew",
+		MaxActive:   20,
+		MaxIdle:     5,
+		IdleTimeout: time.Minute * 5,
 	})
 	if err != nil {
-		log.Fatal(NewError(err.Error()))
+		log.Fatal(NewMaskedError(err))
 	}
 	log.Info("Connected to database ", session)
 	return session

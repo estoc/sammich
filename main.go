@@ -58,6 +58,12 @@ func buildServer() *chain.Stack {
 	router.GET("/ping", RtePing)
 	router.GET("/hello/:name", RteHelloWorld)
 	router.GET("/preferences/categories", RteGetCategories)
+	router.POST("/sessions", RteNotImplemented)
+	router.GET("/sessions/:id", RteNotImplemented)
+	router.PUT("/sessions/:id", RteNotImplemented)
+	router.POST("/sessions/:id", RteNotImplemented)
+	router.POST("/sessions/:id/start", RteNotImplemented)
+	router.POST("/sessions/:id/end", RteNotImplemented)
 
 	// chain middleware
 	stack := chain.NewStack()

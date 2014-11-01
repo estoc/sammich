@@ -37,3 +37,7 @@ func RteGetCategories(w http.ResponseWriter, req *http.Request, p router.Params)
 
 	w.Write(j)
 }
+
+func RteNotImplemented(w http.ResponseWriter, req *http.Request, p router.Params) {
+	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+}

@@ -36,5 +36,6 @@ func MdwLog(next http.Handler) http.Handler {
 		finish := time.Since(start)
 
 		go l.WithFields(log.Fields{"Duration": finish}).Info("Response")
+		go context.Clear(req)
 	})
 }

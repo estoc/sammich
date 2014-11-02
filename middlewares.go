@@ -5,6 +5,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/gorilla/context"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -19,11 +20,13 @@ func MdwId(next http.Handler) http.Handler {
 	})
 }
 
-// Logs incoming requests and outgoing responses
+// Logs incoming requests and outgoing responses. Also provides a child logger to each request's context.
 func MdwLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		go log.WithFields(log.Fields{
-			"Id":         req.Header.Get(ID_HEADER),
+		l := log.WithFields(log.Fields{"Id": req.Header.Get(ID_HEADER)})
+		context.Set(req, l, "log")
+
+		go l.WithFields(log.Fields{
 			"Host":       req.Host,
 			"Method":     req.Method,
 			"RequestURI": req.RequestURI}).Info("Request")
@@ -32,8 +35,6 @@ func MdwLog(next http.Handler) http.Handler {
 		next.ServeHTTP(w, req)
 		finish := time.Since(start)
 
-		go log.WithFields(log.Fields{
-			"Id":       req.Header.Get(ID_HEADER),
-			"Duration": finish}).Info("Response")
+		go l.WithFields(log.Fields{"Duration": finish}).Info("Response")
 	})
 }

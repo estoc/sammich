@@ -1,64 +1,26 @@
 #%RAML 0.8
 title: ChewCrew
 version: v1
-baseUri: http://chewcrew.io/{version}
-
-/preferences:
-  /categories:
-    get:
-      description: Get all category type preferences (BBQ, Chinese, Pizza, etc.)
+baseUri: http://chewcrew.io/
 
 /sessions:
   post:
-    description: Create a voting session
-    responses:
-      200:
-        body:
-          application/json:
-            schema: |
-              {
-              "$schema": "http://json-schema.org/schema",
-              "type": "object",
-              "description": "A voting session",
-              "properties": {
-              "sessionId": "Session UUID",
-              "sessionId": { "type": "string" }
-              }}
+    description: Create a voting session. Returns the session ID that voters will use to connect to the session.
   /{id}:
-    /start:
-      post:
-        description: Starts the voting session
-        queryParameters:
-          voterId:
-            description: Voter UUID to identify the session host
-    /end:
-      post:
-        description: Forcefully ends a voting session
-        queryParameters:
-          voterId:
-            description: Voter UUID to identify the session host
-    put:
-      description: Update a voting session (will be done when voters first enter a session)
+	post:
+      description: Join a session. Returns the voter ID that each voter will use for future actions.
       queryParameters:
         name:
-          description: Voters name
-        preferences:
-          description: Preferences to add
-      responses:
-        200:
-          body:
-            application/json:
-              schema: |
-                {
-                "$schema": "http://json-schema.org/schema",
-                "type": "object",
-                "description": "Voter UUID",
-                "properties": {
-                "voterId": "UUID assigned to this voter",
-                "voterId": {"type": "string"}
-                }}
+          description: Voter name
+    put:
+      description: Vote in a session
+      queryParameters:
+        voterid:
+          description: Voter ID
+        choiceid:
+          description: Choice ID
     get:
-      description: Retrieve a voting session
+      description: Retrieve a voting session. If the session is Started, then choices will be populated. If the session is Ended (either by everyone voting or forcefully ended by the host), then the vote count for each choice will be populated.
       responses:
         200:
           body:
@@ -69,29 +31,28 @@ baseUri: http://chewcrew.io/{version}
                 "type": "object",
                 "description": "A voting session",
                 "properties": {
-                "voterId": "Current voter UUID. Will be populated if voter has Put their preferences.",
-                "voterId": {"type": "string"},
-                "voters": "Total number of unique voters participating",
+                "voters": "Participating voters",
                 "voters": {
                   "type": "array",
                   "name": {"type": "string"}
                   },
-                "voted": "Total number of current votes",
-                "voted": {"type": "int"},
-                "choices": "Voting choices. Will be populated when the voting session has started.",
+                "choices": "Voting choices. Will be populated when the voting session has started. Vote counts will be populated once votes are tallied.",
                 "choices": {
                   "type": "array",
                   "items": {"type" : "string"},
-                  "minItems": 3,
+                  "minItems": 5,
                   "uniqueItems": true
-                  },
-                "result": "The winning result. Will be populated when all users have voted or the session has ended.",
-                "result": {"type": "string"}
+                  }
                 }}
-    post:
-      description: Submit a vote to a voting session
-      queryParameters:
-        choice:
-          description: Vote to submit
-        voterId:
-          description: UUID of voter
+	/start:
+      post:
+        description: Starts the voting session. Only the session host is authorized to start the vote.
+        queryParameters:
+          voterid:
+            description: Voter ID to identify the session host
+    /end:
+      post:
+        description: Forcefully ends a voting session to tally existing votes. Only the session host is authorized.
+        queryParameters:
+          voterid:
+            description: Voter ID to identify the session host

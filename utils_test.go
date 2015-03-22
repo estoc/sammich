@@ -6,8 +6,9 @@ import (
 
 // Generate IDs and ensure they are unique
 func TestGenereateId(t *testing.T) {
+	// key value = number of occurences
 	var m = make(map[string]int)
-	i := 100
+	i := 1000
 	for i > 0 {
 		id := generateId()
 		m[id] = m[id] + 1

@@ -2,194 +2,191 @@ package main
 
 import (
 	"errors"
-	"strings"
+	"sync"
 )
 
+type Sessions map[string]*Session
+
 type Session struct {
-	ID string `json:"id,omitempty"`
+	Id string `json:"id"`
 
-	// The ID of the current voter
-	VoterID string `json:"voterid,omitempty"`
+	// The ID of the current voter. Only returned when a user first creates/joins a session.
+	VoterId string `json:"voterid,omitempty"`
 
-	// [string] keys are IDs
-	Voters  map[string]Voter  `json:"voters,omitempty"`
-	Choices map[string]Choice `json:"choices,omitempty"`
+	// List of voters. Populated as users join the session.
+	Voters `json:"voters,omitempty"`
 
-	// The Host is the one who Creates/Starts the session
-	// Omit to prevent host spoofing
-	HostID string `json:"-"`
-}
+	// The current voter. Populated in get().
+	CurrentVoter *Voter `json:"currentvoter,omitempty"`
 
-type Voter struct {
-	Name  string `json:"name"`
-	Voted bool   `json:"voted,omitempty"`
+	// List of choices. Populated in ready().
+	Choices `json:"choices,omitempty"`
 
-	// Omit to maintain vote anonymity
-	Vote string `json:"-"`
-}
+	// The winning choice. Populated in vote().
+	Winner *Choice `json:"winner,omitempty"`
 
-type Choice struct {
-	Place string `json:"place"`
-	Votes int    `json:"votes,omitempty"`
+	sync.Mutex `json:"-"`
 }
 
 var (
-	sessions map[string]Session = make(map[string]Session)
-
-	ErrorSessionNotFound = errors.New("Session not found")
-	ErrorNameInUse       = errors.New("Name already used")
-	ErrorVoterNotFound   = errors.New("Voter not found")
-	ErrorUnauthorized    = errors.New("Must be host to perform this action")
+	ErrorSessionNotFound   = errors.New("Session not found")
+	ErrorSessionInProgress = errors.New("Session is in progress")
+	ErrorSessionNotReady   = errors.New("Session is not ready for voting")
+	ErrorSessionFinished   = errors.New("Session has ended")
 )
 
-// Create a session
-func sessionCreate() (Session, error) {
+// Get a session.
+// VoterId is required to get details about the current voter.
+// Returns a pointer to the true session (the one persisted in the database).
+func (s Sessions) get(id string, voterid string) (*Session, error) {
+	session, ok := s[id]
+	if !ok {
+		return nil, ErrorSessionNotFound
+	}
+
+	if voterid != "" {
+		voter, err := session.Voters.getById(voterid)
+		if err != nil {
+			return nil, err
+		}
+		session.CurrentVoter = voter
+	} else {
+		session.CurrentVoter = nil
+	}
+
+	return session, nil
+}
+
+// Creates a new session and adds the first voter as host.
+// Returns a session object containing only a SessionID and VoterID.
+func (s Sessions) create(votername string) (*Session, error) {
 	session := Session{
-		ID:      generateId(),
-		Voters:  make(map[string]Voter),
-		Choices: make(map[string]Choice),
+		Id:      generateId(),
+		Voters:  Voters{},
+		Choices: Choices{},
+		Winner:  nil,
 	}
-	sessions[session.ID] = session
-	return session, nil
+
+	voter, _ := session.Voters.add(votername)
+	s[session.Id] = &session
+
+	// Returning only the essentials to keep the voterID private.
+	result := Session{
+		Id:      session.Id,
+		VoterId: voter.Id,
+	}
+	return &result, nil
 }
 
-// Retrieve a session
-func sessionGet(id string) (Session, error) {
-	session, ok := sessions[id]
+// Joins a session.
+// Returns a session object containing ONLY a SessionID and VoterID.
+func (s Sessions) join(id string, voterName string) (*Session, error) {
+	session, ok := s[id]
 	if !ok {
-		return Session{}, ErrorSessionNotFound
+		return nil, ErrorSessionNotFound
+	}
+	session.Lock()
+	defer session.Unlock()
+
+	// Can't join a session that is already in progress
+	if len(session.Choices) > 0 {
+		return nil, ErrorSessionInProgress
 	}
 
-	if everyoneVoted(session) && votesAreUncounted(session) {
-		sessions[id] = tallyVotes(session)
+	voter, err := session.Voters.add(voterName)
+	if err != nil {
+		return nil, err
 	}
-	return session, nil
+
+	// Returning only the essentials to keep the voterID private.
+	result := Session{
+		Id:      session.Id,
+		VoterId: voter.Id,
+	}
+	return &result, nil
 }
 
-func everyoneVoted(session Session) bool {
-	for _, v := range session.Voters {
-		if v.Voted == false {
-			return false
-		}
-	}
-	return true
-}
-
-func votesAreUncounted(session Session) bool {
-	for _, v := range session.Choices {
-		if v.Votes > 0 {
-			return false
-		}
-	}
-	return true
-}
-
-func tallyVotes(session Session) Session {
-	choices := session.Choices
-	for k, v := range session.Voters {
-		choice := choices[k]
-		result := Choice{
-			Place: choice.Place,
-			Votes: choice.Votes + 1,
-		}
-		choices[v.Vote] = result
-	}
-	return session
-}
-
-// Joins a session and adds the new user
-func sessionJoin(id string, name string) (Session, error) {
-	session, ok := sessions[id]
+// Sets a user as Ready to vote.
+// Generates choices if everyone is ready.
+// Returns only an error if encountered.
+func (s Sessions) ready(id string, voterid string) error {
+	session, ok := s[id]
 	if !ok {
-		return Session{}, ErrorSessionNotFound
+		return ErrorSessionNotFound
+	}
+	session.Lock()
+	defer session.Unlock()
+
+	// Skip if the session has already finished
+	if session.Winner != nil {
+		return ErrorSessionFinished
+	}
+	// Skip if session is already in progress
+	if len(session.Choices) > 0 {
+		return ErrorSessionInProgress
 	}
 
-	// Ensure name is unique
-	for _, v := range session.Voters {
-		if strings.ToLower(v.Name) == strings.ToLower(name) {
-			return session, ErrorNameInUse
-		}
+	// Set voter to Ready
+	v, err := session.Voters.getById(voterid)
+	if err != nil {
+		return err
+	}
+	v.ready()
+
+	// Generate choices once everyone is ready
+	// Also clear out the Ready flags
+	if session.Voters.everyoneReady() {
+		session.Choices.generate(3)
+		session.Voters.clearReady()
 	}
 
-	voterid := generateId()
-	voter := Voter{
-		Name:  name,
-		Voted: false,
-	}
-	session.Voters[voterid] = voter
-
-	// First to join is host
-	if session.HostID == "" {
-		session.HostID = voterid
-	}
-
-	sessions[id] = session
-	// Do this after updating the session object because this should be sent to the client, but not saved (since each user will have a different voterID)
-	session.VoterID = voterid
-
-	return session, nil
+	return nil
 }
 
-// Vote in a session
-func sessionVote(id string, voterid string, choiceid string) (Session, error) {
-	session, ok := sessions[id]
+// Lock in a vote.
+// Tallys votes and determines winner if the last vote.
+// Returns only an error if encountered.
+func (s Sessions) vote(id string, voterId string, choiceId string) error {
+	session, ok := s[id]
 	if !ok {
-		return Session{}, ErrorSessionNotFound
+		return ErrorSessionNotFound
+	}
+	session.Lock()
+	defer session.Unlock()
+
+	// Skip if the session has already finished
+	if session.Winner != nil {
+		return ErrorSessionFinished
+	}
+	// Skip if the session is not ready for votes
+	if len(session.Choices) == 0 {
+		return ErrorSessionNotReady
 	}
 
-	voter, ok := session.Voters[voterid]
-	if !ok {
-		return session, ErrorVoterNotFound
+	voter, err := session.Voters.getById(voterId)
+	if err != nil {
+		return err
+	}
+	choice, err := session.Choices.getById(choiceId)
+	if err != nil {
+		return err
 	}
 
-	voter.Vote = choiceid
-	voter.Voted = true
-	session.Voters[voterid] = voter
+	err = voter.vote()
+	if err != nil {
+		// Error thrown if voter has already voted
+		return err
+	}
+	choice.vote()
 
-	sessions[id] = session
-	return session, nil
-}
-
-// Starts a session by populating its Choices
-func sessionStart(id string, voterid string) (Session, error) {
-	session, ok := sessions[id]
-	if !ok {
-		return Session{}, ErrorSessionNotFound
+	// Tally votes if this was the last vote
+	// Also clear out the Choices, and Voted flags
+	if session.Voters.everyoneVoted() {
+		winner := session.Choices.determineWinner()
+		session.Winner = &winner
+		session.Choices = nil
+		session.Voters.clearVoted()
 	}
 
-	if voterid != session.HostID {
-		return Session{}, ErrorUnauthorized
-	}
-
-	for _, place := range getPlaces(5) {
-		choice := Choice{
-			Place: place,
-			Votes: 0,
-		}
-		session.Choices[generateId()] = choice
-	}
-
-	sessions[id] = session
-	return session, nil
-}
-
-// Ends a session by forcing all voters to show as voted
-// This will kick off TallyVotes the next time sessionGet() is called
-func sessionEnd(id string, voterid string) (Session, error) {
-	session, ok := sessions[id]
-	if !ok {
-		return Session{}, ErrorSessionNotFound
-	}
-
-	if voterid != session.HostID {
-		return Session{}, ErrorUnauthorized
-	}
-
-	for k, v := range session.Voters {
-		v.Voted = true
-		session.Voters[k] = v
-	}
-
-	sessions[id] = session
-	return session, nil
+	return nil
 }

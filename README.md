@@ -9,6 +9,7 @@
 git clone git://github.com/wafflehaus/chewcrew.git
 cd chewcrew
 go get
+go test
 go build
 ```
 

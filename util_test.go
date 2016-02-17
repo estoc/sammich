@@ -10,7 +10,7 @@ func TestGenereateId(t *testing.T) {
 	var m = make(map[string]int)
 	i := 1000
 	for i > 0 {
-		id := generateId()
+		id := generateID()
 		m[id] = m[id] + 1
 		i--
 	}

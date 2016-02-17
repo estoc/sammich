@@ -2,19 +2,19 @@
 
 ## Getting Started
 
-* Install [Go](http://golang.org) or use [gvm](https://github.com/moovweb/gvm)
+* Install [Go](http://golang.org) (recommend using [gvm](https://github.com/moovweb/gvm))
 
-* Download and build chewcrew
+* Download and build
+
 ```bash
 git clone git://github.com/wafflehaus/chewcrew.git
 cd chewcrew
-go get
+go get && go build
 go test
-go build
 ```
 
-* Start chewcrew and view the API reference
+* Run
+
 ```bash
 ./chewcrew -port=8080
-http://localhost:8080/api
 ```

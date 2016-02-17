@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_")
+	letters = []rune("abcdefghijklmnopqrstuvwxyz1234567890")
 )
 
 // Generates a string of random characters
-func generateId() string {
-	b := make([]rune, 15)
+func generateID() string {
+	b := make([]rune, 6)
 	for i := range b {
 		rand.Seed(time.Now().UnixNano())
 		b[i] = letters[rand.Intn(len(letters))]

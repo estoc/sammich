@@ -17,5 +17,6 @@ _testmain.go
 *.exe
 *.test
 *.prof
+*rplugin*
 # Built Executable
 chewcrew

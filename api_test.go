@@ -5,8 +5,8 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	var r = NewRooms()
-	room, err := r.New("address")
+	var api = NewAPI(MockPlaceAPI{})
+	room, err := api.New("address")
 	if err != nil {
 		t.Error(err)
 	}
@@ -22,9 +22,9 @@ func TestNew(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	var r = NewRooms()
-	room, _ := r.New("address")
-	room, err := r.Get(room.ID)
+	var api = NewAPI(MockPlaceAPI{})
+	room, _ := api.New("address")
+	room, err := api.Get(room.ID)
 	if err != nil {
 		t.Error(err)
 	}
@@ -40,23 +40,23 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetNonexistent(t *testing.T) {
-	var r = NewRooms()
-	_, err := r.Get("ID That Doesnt Exist")
+	var api = NewAPI(MockPlaceAPI{})
+	_, err := api.Get("ID That Doesnt Exist")
 	if err != ErrorRoomNotFound {
 		t.Error("Should have gotten not found error")
 	}
 }
 
 func TestVote(t *testing.T) {
-	var r = NewRooms()
-	room, _ := r.New("address")
+	var api = NewAPI(MockPlaceAPI{})
+	room, _ := api.New("address")
 	voterName := "Name123"
-	err := r.Vote(room.ID, voterName, room.Choices[0])
+	err := api.Vote(room.ID, voterName, room.Choices[0])
 	if err != nil {
 		t.Error(err)
 	}
 
-	room, err = r.Get(room.ID)
+	room, err = api.Get(room.ID)
 	if err != nil {
 		t.Error(err)
 	}
@@ -66,29 +66,29 @@ func TestVote(t *testing.T) {
 }
 
 func TestEnd(t *testing.T) {
-	var r = NewRooms()
-	room, _ := r.New("address")
+	var api = NewAPI(MockPlaceAPI{})
+	room, _ := api.New("address")
 	hostID := room.HostID
 	choice := room.Choices[0]
-	r.Vote(room.ID, "votername", choice)
+	api.Vote(room.ID, "votername", choice)
 
-	err := r.End(room.ID, "Not Host ID")
+	err := api.End(room.ID, "Not Host ID")
 	if err != ErrorUnauthorized {
 		t.Error("Should get unauthorized error with wrong hostID")
 	}
 
-	err = r.End(room.ID, hostID)
+	err = api.End(room.ID, hostID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	room, err = r.Get(room.ID)
+	room, err = api.Get(room.ID)
 	// MockAPI returns choice string as winner
 	if room.Winner != choice {
 		t.Error("Should have winner after end")
 	}
 
-	err = r.Vote(room.ID, "votername", "choice")
+	err = api.Vote(room.ID, "votername", "choice")
 	if err != ErrorRoomEnded {
 		t.Error("Should have gotten room ended error")
 	}

@@ -10,7 +10,6 @@
 git clone git://github.com/wafflehaus/chewcrew.git
 cd chewcrew
 go get && go build
-go test
 ```
 
 * Run

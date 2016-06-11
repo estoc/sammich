@@ -2,46 +2,34 @@
 package main
 
 import (
-	"encoding/json"
 	"math/rand"
-	"net/http"
+	"time"
 )
 
-var (
-	// chars used to generate a random ID
-	letters    = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
-	letterslen = len(letters)
+const (
+	letterBytes   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	letterIdxBits = 6                    // 6 bits to represent a letter index
+	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
+	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
 )
+
+var src = rand.NewSource(time.Now().UnixNano())
 
 // Generates a string of random characters
-func generateID() string {
-	b := make([]rune, 7)
-	for i := range b {
-		b[i] = letters[rand.Intn(letterslen)]
+func generateID(n int) string {
+	b := make([]byte, n)
+	// A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
+	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+		if remain == 0 {
+			cache, remain = src.Int63(), letterIdxMax
+		}
+		if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+			b[i] = letterBytes[idx]
+			i--
+		}
+		cache >>= letterIdxBits
+		remain--
 	}
+
 	return string(b)
-}
-
-// Send JSON result/error response back to client
-func sendJSON(w http.ResponseWriter, room *Room, err error) {
-	// Enable CORS
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "text/json")
-
-	if err != nil {
-		// Send Error JSON result
-		e := map[string]string{"error": err.Error()}
-		result, _ := json.Marshal(e)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(result)
-	} else if room != nil {
-		// Send Room result
-		result, _ := json.Marshal(*room)
-		w.WriteHeader(http.StatusOK)
-		w.Write(result)
-	} else {
-		// Send blank result
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(""))
-	}
 }

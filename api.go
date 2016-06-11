@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -63,7 +64,7 @@ func NewAPI(placeAPI PlaceAPI) *API {
 func (api *API) GetHandler(res http.ResponseWriter, req *http.Request) {
 	id := req.URL.Query().Get("id")
 	room, err := api.Get(id)
-	sendJSON(res, room, err)
+	api.sendJSON(res, room, err)
 }
 
 // New Session Handler
@@ -77,7 +78,7 @@ func (api *API) NewHandler(res http.ResponseWriter, req *http.Request) {
 	address := qp.Get("address")
 
 	room, err := api.New(address)
-	sendJSON(res, room, err)
+	api.sendJSON(res, room, err)
 }
 
 // Vote Session Handler
@@ -93,7 +94,7 @@ func (api *API) VoteHandler(res http.ResponseWriter, req *http.Request) {
 	vote := qp.Get("vote")
 
 	err := api.Vote(id, name, vote)
-	sendJSON(res, nil, err)
+	api.sendJSON(res, nil, err)
 }
 
 // End Session Handler
@@ -108,7 +109,7 @@ func (api *API) EndHandler(res http.ResponseWriter, req *http.Request) {
 	hostid := qp.Get("hostid")
 
 	err := api.End(id, hostid)
-	sendJSON(res, nil, err)
+	api.sendJSON(res, nil, err)
 }
 
 // Get a room!
@@ -131,8 +132,8 @@ func (api *API) New(address string) (*Room, error) {
 
 	// Create new rom
 	room := Room{
-		ID:           generateID(),
-		HostID:       generateID(),
+		ID:           generateID(11),
+		HostID:       generateID(11),
 		Choices:      []string{},
 		Votes:        make(map[string]int32),
 		PlaceOptions: PlaceOptions{},
@@ -173,7 +174,7 @@ func (api *API) Vote(id string, name string, vote string) error {
 	return nil
 }
 
-// End ends a voting session
+// End a voting session
 // Tally votes and deterimine winning place
 // Can only be used by the Host
 func (api *API) End(id string, hostid string) error {
@@ -207,4 +208,28 @@ func (api *API) End(id string, hostid string) error {
 	place, _ := api.PlaceAPI.Get(room.PlaceOptions, winner)
 	room.Winner = string(place)
 	return nil
+}
+
+// Send JSON result/error response back to client
+func (api *API) sendJSON(w http.ResponseWriter, room *Room, err error) {
+	// Enable CORS
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "text/json")
+
+	if err != nil {
+		// Send Error JSON result
+		e := map[string]string{"error": err.Error()}
+		result, _ := json.Marshal(e)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(result)
+	} else if room != nil {
+		// Send Room result
+		result, _ := json.Marshal(room)
+		w.WriteHeader(http.StatusOK)
+		w.Write(result)
+	} else {
+		// Send blank result
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(""))
+	}
 }

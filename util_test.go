@@ -9,7 +9,7 @@ func TestGenereateId(t *testing.T) {
 	// Set of generated IDs
 	var m = make(map[string]bool)
 
-	for i := 100000; i > 0; i-- {
+	for i := 1000000; i > 0; i-- {
 		id := generateID(11)
 
 		// Ensure unique ID

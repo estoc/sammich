@@ -3,9 +3,7 @@ package main
 import (
 	"flag"
 	"log"
-	"math/rand"
 	"net/http"
-	"time"
 )
 
 func main() {
@@ -13,9 +11,6 @@ func main() {
 	port := flag.String("port", "8080", "Port to run on.")
 	apikey := flag.String("apikey", "", "Places API Key. Mock API will be used if none provided.")
 	flag.Parse()
-
-	// Seed RNG for generateID()
-	rand.Seed(time.Now().UTC().UnixNano())
 
 	// Initialize PlaceAPI, use Mock by default
 	placeAPI := PlaceAPI(MockPlaceAPI{})

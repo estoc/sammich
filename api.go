@@ -68,11 +68,6 @@ func (api *API) GetHandler(res http.ResponseWriter, req *http.Request) {
 
 // New Session Handler
 func (api *API) NewHandler(res http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
-		http.Error(res, "Invalid request method", http.StatusBadRequest)
-		return
-	}
-
 	qp := req.URL.Query()
 	address := qp.Get("address")
 
@@ -82,11 +77,6 @@ func (api *API) NewHandler(res http.ResponseWriter, req *http.Request) {
 
 // Vote Session Handler
 func (api *API) VoteHandler(res http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
-		http.Error(res, "Invalid request method", http.StatusBadRequest)
-		return
-	}
-
 	qp := req.URL.Query()
 	id := qp.Get("id")
 	name := qp.Get("name")
@@ -98,11 +88,6 @@ func (api *API) VoteHandler(res http.ResponseWriter, req *http.Request) {
 
 // End Session Handler
 func (api *API) EndHandler(res http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
-		http.Error(res, "Invalid request method", http.StatusBadRequest)
-		return
-	}
-
 	qp := req.URL.Query()
 	id := qp.Get("id")
 	hostid := qp.Get("hostid")

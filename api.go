@@ -51,7 +51,7 @@ var (
 	ErrorUnauthorized = errors.New("Unauthorized host ID")
 )
 
-// NewAPI used to initialize a new API
+// NewAPI initializes a new API
 func NewAPI(placeAPI PlaceAPI) *API {
 	return &API{
 		Rooms:    make(map[string]*Room),
@@ -109,8 +109,8 @@ func (api *API) Get(id string) (*Room, error) {
 	return room, nil
 }
 
-// New creates a new room.
-// The only method that returns HostID to keep it secret.
+// New creates a new room
+// The only method that returns HostID to keep it secret
 func (api *API) New(address string) (*Room, error) {
 	log.Printf("NEW address=%s\n", address)
 
@@ -198,7 +198,7 @@ func (api *API) End(id string, hostid string) error {
 func (api *API) sendJSON(w http.ResponseWriter, room *Room, err error) {
 	// Enable CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "text/json")
+	w.Header().Set("Content-Type", "application/json")
 
 	if err != nil {
 		// Send Error JSON result

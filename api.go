@@ -10,8 +10,7 @@ import (
 )
 
 type API struct {
-	// Rooms is the list of current rooms/sessions
-	// Key = Room ID
+	// Rooms is list of current rooms/sessions (Key = Room ID)
 	Rooms map[string]*Room
 	PlaceAPI
 }
@@ -21,25 +20,25 @@ type Room struct {
 	// ID of the Room
 	ID string `json:"id"`
 
-	// The ID of the room creatoapi.
-	// Only returned in New() to remain secret.
+	// ID of the room creator
+	// Only returned in New() to remain secret
 	HostID string `json:"hostid,omitempty"`
 
-	// List of voters.
+	// List of voters
 	Voters []string `json:"voters,omitempty"`
 
-	// List of choices and their total number of votes.
+	// List of choices
 	Choices []string `json:"choices,omitempty"`
 
-	// List of votes.
-	// Seperate from Choices so the number of votes remains secret.
+	// List of choices and their total number of votes
+	// Seperate from Choices so the number of votes remains secret
 	Votes map[string]int32 `json:"-"`
 
-	// The winning choice.
+	// The winning choice - when populated signals end of voting
 	Winner string `json:"winner,omitempty"`
 
-	// Options for the Place API.
-	// TODO: Set in New().
+	// Options for the Place API
+	// TODO: Set in New()
 	PlaceOptions `json:"-"`
 
 	// Mutex used to ensure syncronization
